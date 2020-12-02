@@ -1,5 +1,5 @@
 # sub-sync
-`subsync` is a script written in Python that enables the setting of subtitle time offsets to a selected `srt` file through the CLI.
+`subsync` is a Python script that enables the setting of subtitle time offsets to a selected `srt` file through the CLI.
 
 ## Usage
 The script can be executed via the CLI with or without a `-p` or `--path` optional argument. If omitting the use, the script will look for a `srt` file in the current working directory and exit if none or more than one match is found.
