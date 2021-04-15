@@ -10,9 +10,8 @@ An offset is passed in as a positional argument and is expressed in seconds
 On default, a .srt file located in the current directory is taken in
 A condition for that to happen is that exactly 1 .srt file exists in it
 
-To specify the exact file, two flags can be used:
---absolute: passes an absolute path to the file
---name: passes a relative path (name) of the file
+To specify the exact file, a path keyword argument can be used:
+--path: passes an absolute or relative path to the file
 
 Upon running, the old subtitle file "foo" will be renamed to "foo-old" and the newly output file
 with the offsets in place will now be named "foo". The old file is not automatically deleted
