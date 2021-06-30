@@ -28,8 +28,6 @@ from typing import List
 def main() -> None:
     """
     Core delegation of tasks to other functions and their stockpile
-
-    :return: None
     """
     args: Namespace = parse_args()
     subfile: str = get_file(args)
@@ -68,8 +66,10 @@ def get_file(args: Namespace) -> str:
     srts: List[str] = glob.glob('*.srt')
 
     if len(srts) != 1:
-        sys.exit(f'More than 1 .srt file found: {len(srts)}\n'
-                 f'Consider using the --path flag to specify precisely one')
+        sys.exit(
+            f'More than 1 .srt file found: {len(srts)}\n'
+            f'Consider using the --path flag to specify precisely one'
+        )
 
     return srts[0]
 
@@ -81,7 +81,6 @@ def change_timelines(args: Namespace, subfile: str) -> None:
 
     :param args: an object holding the parsed args
     :param subfile: path to the sub file
-    :return: None
     """
     with open(subfile, 'r', encoding='ISO-8859-1') as rf:
         raw: str = rf.read()
@@ -92,13 +91,19 @@ def change_timelines(args: Namespace, subfile: str) -> None:
     raw_inits: List[str] = [timeline.split()[0] for timeline in timelines]
     raw_ends: List[str] = [timeline.split()[2] for timeline in timelines]
 
-    inits: List[td] = [td(hours=float(r.split(':')[0]), minutes=float(r.split(':')[1]),
-                          seconds=float(r.split(':')[2].split(',')[0]),
-                          milliseconds=float(r.split(':')[2].split(',')[1])) for r in raw_inits]
+    inits: List[td] = [td(
+        hours=float(r.split(':')[0]),
+        minutes=float(r.split(':')[1]),
+        seconds=float(r.split(':')[2].split(',')[0]),
+        milliseconds=float(r.split(':')[2].split(',')[1])
+    ) for r in raw_inits]
 
-    ends: List[td] = [td(hours=float(r.split(':')[0]), minutes=float(r.split(':')[1]),
-                         seconds=float(r.split(':')[2].split(',')[0]),
-                         milliseconds=float(r.split(':')[2].split(',')[1])) for r in raw_ends]
+    ends: List[td] = [td(
+        hours=float(r.split(':')[0]),
+        minutes=float(r.split(':')[1]),
+        seconds=float(r.split(':')[2].split(',')[0]),
+        milliseconds=float(r.split(':')[2].split(',')[1])
+    ) for r in raw_ends]
 
     offset: td = td(seconds=args.offset)
 
@@ -109,24 +114,26 @@ def change_timelines(args: Namespace, subfile: str) -> None:
         inits[idx]: td = init_time + offset
         ends[idx]: td = end_time + offset
 
-    re_inits: List[str] = [str(f)[:-3].zfill(12).replace('.', ',') if f.microseconds
-                           else f'{str(f).zfill(8)},000' for f in inits]
+    re_inits: List[str] = [
+        str(f)[:-3].zfill(12).replace('.', ',') if f.microseconds else f'{str(f).zfill(8)},000' for f in inits
+    ]
 
-    re_ends: List[str] = [str(f)[:-3].zfill(12).replace('.', ',') if f.microseconds
-                          else f'{str(f).zfill(8)},000' for f in ends]
+    re_ends: List[str] = [
+        str(f)[:-3].zfill(12).replace('.', ',') if f.microseconds else f'{str(f).zfill(8)},000' for f in ends
+    ]
 
-    cooked: str = raw
+    formatted: str = raw
 
     for raw_i, re_i in zip(raw_inits, re_inits):
-        cooked: str = cooked.replace(raw_i, re_i)
+        formatted: str = formatted.replace(raw_i, re_i)
 
     for raw_e, re_e in zip(raw_ends, re_ends):
-        cooked: str = cooked.replace(raw_e, re_e)
+        formatted: str = formatted.replace(raw_e, re_e)
 
     os.rename(subfile, subfile.replace('.srt', '-old.srt'))
 
     with open(subfile, 'w') as wf:
-        wf.write(cooked)
+        wf.write(formatted)
 
 
 if __name__ == '__main__':
