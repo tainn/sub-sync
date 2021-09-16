@@ -21,7 +21,7 @@ optional arguments:
   -p , --path   absolute or relative path to the file
 ```
 
-A negative offset value hastens, while a positive offset value delays the subtitles.
+A negative offset value **hastens**, while a positive offset value **delays** the subtitles.
 
 ## Bad forms
 
