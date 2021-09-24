@@ -17,9 +17,9 @@ Upon running, the old subtitle file "foo" will be renamed to "foo-old" and the n
 with the offsets in place will now be named "foo". The old file is not automatically deleted
 """
 
-import sys
-import os
 import glob
+import os
+import sys
 from argparse import ArgumentParser, Namespace
 from datetime import timedelta as td
 from typing import List
