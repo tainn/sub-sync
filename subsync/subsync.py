@@ -67,7 +67,7 @@ def get_file(args: Namespace) -> str:
 
     if len(srts) == 0:
         sys.exit(
-            f'No .srt file found'
+            f'No .srt file found\n'
             f'Position yourself in a directory with the file or specify it via the --path flag'
         )
 
