@@ -65,7 +65,13 @@ def get_file(args: Namespace) -> str:
 
     srts: List[str] = glob.glob('*.srt')
 
-    if len(srts) != 1:
+    if len(srts) == 0:
+        sys.exit(
+            f'No .srt file found'
+            f'Position yourself in a directory with the file or specify it via the --path flag'
+        )
+
+    elif len(srts) != 1:
         sys.exit(
             f'More than 1 .srt file found: {len(srts)}\n'
             f'Consider using the --path flag to specify precisely one'
