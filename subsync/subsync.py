@@ -44,8 +44,8 @@ def parse_args() -> Namespace:
     :return: an object holding the parsed args
     """
     parser: ArgumentParser = ArgumentParser()
-    parser.add_argument('offset', help='amount of seconds to shift (+-0.000)', type=float, metavar='offset')
-    parser.add_argument('-p', '--path', help='absolute or relative path to the file', metavar='')
+    parser.add_argument('offset', help='amount of seconds to shift (+-0.000)', type=float)
+    parser.add_argument('-p', '--path', help='absolute or relative path to the file')
     args: Namespace = parser.parse_args()
 
     return args
