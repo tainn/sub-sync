@@ -138,7 +138,7 @@ def change_timelines(args: Namespace, subfile: str) -> None:
 
     os.rename(subfile, subfile.replace('.srt', '-old.srt'))
 
-    with open(subfile, 'w') as wf:
+    with open(subfile, 'w', encoding='ISO-8859-1') as wf:
         wf.write(formatted)
 
 
