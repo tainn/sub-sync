@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 
-"""
-A script for setting offsets to subtitle files
+"""A script for setting offsets to subtitle files.
 
-An offset is passed in as a positional argument and is expressed in seconds
+An offset is passed in as a positional argument and is expressed in seconds:
 - negative: hasten (-0.500)
 - positive: delay (+0.800 or 0.800)
 
-On default, a .srt file located in the current directory is taken in
-A condition for that to happen is that exactly 1 .srt file exists in it
+On default, a .srt file located in the current directory is taken in.
+A condition for that to happen is that exactly 1 .srt file exists in it.
 
 To specify the exact file, a path keyword argument can be used:
---path: passes an absolute or relative path to the file
+--path: passes an absolute or relative path to the file.
 
 Upon running, the old subtitle file "foo" will be renamed to "foo-old" and the newly output file
-with the offsets in place will now be named "foo". The old file is not automatically deleted
+with the offsets in place will now be named "foo". The old file is not automatically deleted.
 """
 
 import glob
@@ -26,9 +25,7 @@ from typing import List
 
 
 def main() -> None:
-    """
-    Core delegation of tasks to other functions and their stockpile
-    """
+    """Core delegation of tasks to other functions and their stockpile."""
     args: Namespace = parse_args()
     subfile: str = get_file(args)
     change_timelines(args, subfile)
@@ -36,10 +33,7 @@ def main() -> None:
 
 
 def parse_args() -> Namespace:
-    """
-    Parses one positional and one optional argument:
-    offset: positional, sets the amount in seconds to either hasten (neg) or delay (pos) the subs
-    --path: optional, finds the file through its absolute or relative path
+    """Parses positional and optional arguments.
 
     :return: an object holding the parsed args
     """
@@ -52,10 +46,10 @@ def parse_args() -> Namespace:
 
 
 def get_file(args: Namespace) -> str:
-    """
-    Fetches the file through a specified method
-    If no method is specified, defaults to the .srt in the current directory
-    Should multiple .srt files exist in the current directory, --path must be given
+    """Fetches the file through a specified method.
+
+    If no method is specified, defaults to the .srt in the current directory.
+    Should multiple .srt files exist in the current directory, --path must be given.
 
     :param args: an object holding the parsed args
     :return: path to the sub file
@@ -81,9 +75,10 @@ def get_file(args: Namespace) -> str:
 
 
 def change_timelines(args: Namespace, subfile: str) -> None:
-    """
+    """Alters the timelines while keeping the original file.
+
     Fetches the timelines from the original sub file, parses them, renames the old file and
-    drops the new timelines with the offset applied to a new sub file with the old one's name
+    drops the new timelines with the offset applied to a new sub file with the old one's name.
 
     :param args: an object holding the parsed args
     :param subfile: path to the sub file
