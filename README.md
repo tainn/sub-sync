@@ -11,15 +11,15 @@ script will look for a `srt` file in the current working directory and exit if n
 Help can be output through the use of the `-h` or `--help` option:
 
 ```
-[user@host ~]$ subsync -h
-usage: subsync [-h] [-p] offset
+[user@host ~]$ subsync.py -h
+usage: subsync.py [-h] [-p PATH] offset
 
 positional arguments:
-  offset        amount of seconds to shift (+-0.000)
+  offset                amount of seconds to shift (+-0.000)
 
-optional arguments:
-  -h, --help    show this help message and exit
-  -p , --path   absolute or relative path to the file
+options:
+  -h, --help            show this help message and exit
+  -p PATH, --path PATH  absolute or relative path to the file
 ```
 
 A negative offset value **hastens**, while a positive offset value **delays** the subtitles.
