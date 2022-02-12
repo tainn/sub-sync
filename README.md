@@ -1,12 +1,22 @@
 # sub-sync
 
-An application written in Python that enables a fixed setting of subtitle time offsets to a selected `srt`
-file through the CLI by overwriting its time intervals.
+![python_version](https://img.shields.io/badge/python-3.6%2B-red)
+![dependencies](https://img.shields.io/badge/dependencies-none-lightgrey)
+
+An application written in Python that enables a fixed setting of subtitle time offsets to a selected **srt**
+file via the CLI by overwriting its time intervals.
+
+It differs from utilizing subtitle shifts inside any media player due to permenently applying timeline changes, not just
+during the active session. Sync audio and subtitles once, watch multiple times.
 
 ## Usage
 
-The script can be executed via the CLI with or without a `-p` or `--path` keyword argument. If omitting the use, the
-script will look for a `srt` file in the current working directory and exit if none or more than one match is found.
+The script can be executed via the CLI with or without a `-p` or `--path` keyword argument.
+
+If omitting the use, the code will look for a **srt** file in the current working directory and exit if none or more
+than one match is found. An exception to this case are **srt** files that abide by a regex match: `*old-[0-9].srt`. This
+is done in order to allow rapid readjustments when attempting to set an audio-subtitle sync via trial and
+error—see [output](#Output).
 
 Help can be output through the use of the `-h` or `--help` option:
 
@@ -22,16 +32,22 @@ options:
   -p PATH, --path PATH  absolute or relative path to the file
 ```
 
-A negative offset value **hastens**, while a positive offset value **delays** the subtitles.
+A negative offset value ***hastens***, while a positive offset value ***delays*** the subtitles.
+
+## Output
+
+The output is a new **srt** file with newly set timelines, with the old file being kept and renamed
+to `-old-{increment}.srt`, where `{increment}` is a serial increment of old **srt** files in the same working directory,
+starting with 0.
 
 ## Bad forms
 
-`srt` files usually follow the principle of:
+**srt** files usually follow the principle of:
 
 1. enumeration,
 2. time interval, and
 3. sub content
 
-This script assumes that to be the form of the passed file and may error out if the form is different. Even though it
-rarely happens, the culprit for such mismatches is usually the bad-form advertising of a sub group at the top of
-the `srt` file. Either manually delete that block or change it to fit the format.
+This code assumes that to be the form of the passed file and may error out if the form is different. Even though it
+rarely happens, the culprit for such mismatches is usually the bad-form advertising of a subtitle group at the top of
+the **srt** file. Either manually delete that block or change it to fit the format.

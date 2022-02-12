@@ -21,11 +21,12 @@ import os
 import sys
 from argparse import ArgumentParser, Namespace
 from datetime import timedelta as td
-from typing import List
+from typing import List, Tuple, Set
 
 
 def main() -> None:
     """Core delegation of tasks to other functions and their stockpile."""
+
     args: Namespace = parse_args()
     subfile: str = get_file(args)
     change_timelines(args, subfile)
@@ -57,12 +58,12 @@ def get_file(args: Namespace) -> str:
     if args.path:
         return args.path if args.path.endswith('.srt') else f'{args.path}.srt'
 
-    srts: List[str] = glob.glob('*.srt')
+    srts: Set[str] = set(glob.glob('*.srt')) - set(glob.glob('*old-[0-9].srt'))
 
     if len(srts) == 0:
         sys.exit(
             f'No .srt file found\n'
-            f'Position yourself in a directory with the file or specify it via the --path flag'
+            f'Position yourself inside a directory with the file or specify it via the --path flag'
         )
 
     elif len(srts) != 1:
@@ -71,7 +72,7 @@ def get_file(args: Namespace) -> str:
             f'Consider using the --path flag to specify precisely one'
         )
 
-    return srts[0]
+    return srts.pop()
 
 
 def change_timelines(args: Namespace, subfile: str) -> None:
@@ -84,57 +85,67 @@ def change_timelines(args: Namespace, subfile: str) -> None:
     :param subfile: path to the sub file
     """
     with open(subfile, 'r', encoding='ISO-8859-1') as rf:
-        raw: str = rf.read()
+        original_subfile: str = rf.read()
 
-    blocks: List[str] = raw.split('\n\n')
+    blocks: List[str] = original_subfile.split('\n\n')
     timelines: List[str] = [line.splitlines()[1] for line in blocks if len(line.splitlines()) >= 3]
 
-    raw_inits: List[str] = [timeline.split()[0] for timeline in timelines]
-    raw_ends: List[str] = [timeline.split()[2] for timeline in timelines]
+    raw_inits_and_ends: List[Tuple[str, str]] = [
+        (timeline.split()[0], timeline.split()[2]) for timeline in timelines
+    ]
 
-    inits: List[td] = [td(
-        hours=float(r.split(':')[0]),
-        minutes=float(r.split(':')[1]),
-        seconds=float(r.split(':')[2].split(',')[0]),
-        milliseconds=float(r.split(':')[2].split(',')[1])
-    ) for r in raw_inits]
+    parsed_inits_and_ends: List[Tuple[td, td]] = [
+        (
+            td(
+                hours=float(raw_init.split(':')[0]),
+                minutes=float(raw_init.split(':')[1]),
+                seconds=float(raw_init.split(':')[2].split(',')[0]),
+                milliseconds=float(raw_init.split(':')[2].split(',')[1])
+            ),
+            td(
+                hours=float(raw_end.split(':')[0]),
+                minutes=float(raw_end.split(':')[1]),
+                seconds=float(raw_end.split(':')[2].split(',')[0]),
+                milliseconds=float(raw_end.split(':')[2].split(',')[1])
+            )
+        ) for raw_init, raw_end in raw_inits_and_ends
+    ]
 
-    ends: List[td] = [td(
-        hours=float(r.split(':')[0]),
-        minutes=float(r.split(':')[1]),
-        seconds=float(r.split(':')[2].split(',')[0]),
-        milliseconds=float(r.split(':')[2].split(',')[1])
-    ) for r in raw_ends]
-
+    altered_inits_and_ends: List[Tuple[td, td]] = list()
     offset: td = td(seconds=args.offset)
 
-    for idx, (init_time, end_time) in enumerate(zip(inits, ends)):
-        if (init_time + offset).total_seconds() < 0:
+    for init, end in parsed_inits_and_ends:
+        if (init + offset).total_seconds() < 0:
             continue
 
-        inits[idx]: td = init_time + offset
-        ends[idx]: td = end_time + offset
+        altered_inits_and_ends.append((init + offset, end + offset))
 
-    re_inits: List[str] = [
-        str(f)[:-3].zfill(12).replace('.', ',') if f.microseconds else f'{str(f).zfill(8)},000' for f in inits
+    formatted_altered_inits_and_ends: List[Tuple[str, str]] = [
+        (
+            str(init)[:-3].zfill(12).replace('.', ',') if init.microseconds else f'{str(init).zfill(8)},000',
+            str(end)[:-3].zfill(12).replace('.', ',') if end.microseconds else f'{str(end).zfill(8)},000'
+        ) for init, end in altered_inits_and_ends
     ]
 
-    re_ends: List[str] = [
-        str(f)[:-3].zfill(12).replace('.', ',') if f.microseconds else f'{str(f).zfill(8)},000' for f in ends
-    ]
+    altered_subfile: str = original_subfile
 
-    formatted: str = raw
+    for (raw_init, raw_end), (altered_init, altered_end) in zip(raw_inits_and_ends, formatted_altered_inits_and_ends):
+        altered_subfile: str = altered_subfile.replace(raw_init, altered_init).replace(raw_end, altered_end)
 
-    for raw_i, re_i in zip(raw_inits, re_inits):
-        formatted: str = formatted.replace(raw_i, re_i)
+    old_subfile: str = subfile.replace('.srt', '-old-0.srt')
+    increment: int = 1
 
-    for raw_e, re_e in zip(raw_ends, re_ends):
-        formatted: str = formatted.replace(raw_e, re_e)
+    while True:
+        if os.path.isfile(old_subfile):
+            old_subfile: str = old_subfile.replace(f'-old-{increment - 1}.srt', f'-old-{increment}.srt')
+            increment += 1
+            continue
 
-    os.rename(subfile, subfile.replace('.srt', '-old.srt'))
+        os.rename(subfile, old_subfile)
+        break
 
     with open(subfile, 'w', encoding='ISO-8859-1') as wf:
-        wf.write(formatted)
+        wf.write(altered_subfile)
 
 
 if __name__ == '__main__':
