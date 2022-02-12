@@ -6,7 +6,7 @@
 An application written in Python that enables a fixed setting of subtitle time offsets to a selected **srt**
 file via the CLI by overwriting its time intervals.
 
-It differs from utilizing subtitle shifts inside any media player due to permenently applying timeline changes, not just
+It differs from utilizing subtitle shifts inside any media player by permenently applying timeline changes, not just
 during the active session. Sync audio and subtitles once, watch multiple times.
 
 ## Usage
