@@ -37,7 +37,7 @@ A negative offset value ***hastens***, while a positive offset value ***delays**
 ## Output
 
 The output is a new **srt** file with newly set timelines, with the old file being kept and renamed
-to `-old-{increment}.srt`, where `{increment}` is a serial increment of old **srt** files in the same working directory,
+to `-old-{increment}.srt`, where `{increment}` is a serial increment of old **srt** files in the same directory,
 starting with 0.
 
 ## Bad forms
