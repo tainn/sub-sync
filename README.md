@@ -16,7 +16,7 @@ The script can be executed via the CLI with or without a `-p` or `--path` keywor
 If omitting the use, the code will look for a **srt** file in the current working directory and exit if none or more
 than one match is found. An exception to this case are **srt** files that abide by a regex match: `*old-[0-9].srt`. This
 is done in order to allow rapid readjustments when attempting to set an audio-subtitle sync via trial and
-error—see [output](#Output).
+error—see [output](#output).
 
 Help can be output through the use of the `-h` or `--help` option:
 
