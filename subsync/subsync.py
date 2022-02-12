@@ -62,14 +62,14 @@ def get_file(args: Namespace) -> str:
 
     if len(srts) == 0:
         sys.exit(
-            f'No .srt file found\n'
-            f'Position yourself inside a directory with the file or specify it via the --path flag'
+            'No .srt file found\n'
+            'Position yourself inside a directory with the file or specify it via the --path flag'
         )
 
     elif len(srts) != 1:
         sys.exit(
             f'More than 1 .srt file found: {len(srts)}\n'
-            f'Consider using the --path flag to specify precisely one'
+            'Consider using the --path flag to specify precisely one'
         )
 
     return srts.pop()
