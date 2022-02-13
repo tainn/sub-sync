@@ -21,7 +21,6 @@ import os
 import sys
 from argparse import ArgumentParser, Namespace
 from datetime import timedelta as td
-from typing import List, Tuple, Set
 
 
 def main() -> None:
@@ -58,7 +57,7 @@ def get_file(args: Namespace) -> str:
     if args.path:
         return args.path if args.path.endswith('.srt') else f'{args.path}.srt'
 
-    srts: Set[str] = set(glob.glob('*.srt')) - set(glob.glob('*old-[0-9].srt'))
+    srts: set[str] = set(glob.glob('*.srt')) - set(glob.glob('*old-[0-9].srt'))
 
     if len(srts) == 0:
         sys.exit(
@@ -87,14 +86,14 @@ def change_timelines(args: Namespace, subfile: str) -> None:
     with open(subfile, 'r', encoding='ISO-8859-1') as rf:
         original_subfile: str = rf.read()
 
-    blocks: List[str] = original_subfile.split('\n\n')
-    timelines: List[str] = [line.splitlines()[1] for line in blocks if len(line.splitlines()) >= 3]
+    blocks: list[str] = original_subfile.split('\n\n')
+    timelines: list[str] = [line.splitlines()[1] for line in blocks if len(line.splitlines()) >= 3]
 
-    raw_inits_and_ends: List[Tuple[str, str]] = [
+    raw_inits_and_ends: list[tuple[str, str]] = [
         (timeline.split()[0], timeline.split()[2]) for timeline in timelines
     ]
 
-    parsed_inits_and_ends: List[Tuple[td, td]] = [
+    parsed_inits_and_ends: list[tuple[td, td]] = [
         (
             td(
                 hours=float(raw_init.split(':')[0]),
@@ -111,7 +110,7 @@ def change_timelines(args: Namespace, subfile: str) -> None:
         ) for raw_init, raw_end in raw_inits_and_ends
     ]
 
-    altered_inits_and_ends: List[Tuple[td, td]] = list()
+    altered_inits_and_ends: list[tuple[td, td]] = list()
     offset: td = td(seconds=args.offset)
 
     for init, end in parsed_inits_and_ends:
@@ -120,7 +119,7 @@ def change_timelines(args: Namespace, subfile: str) -> None:
 
         altered_inits_and_ends.append((init + offset, end + offset))
 
-    formatted_altered_inits_and_ends: List[Tuple[str, str]] = [
+    formatted_altered_inits_and_ends: list[tuple[str, str]] = [
         (
             str(init)[:-3].zfill(12).replace('.', ',') if init.microseconds else f'{str(init).zfill(8)},000',
             str(end)[:-3].zfill(12).replace('.', ',') if end.microseconds else f'{str(end).zfill(8)},000'
