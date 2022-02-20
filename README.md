@@ -1,6 +1,6 @@
 # sub-sync
 
-![python_version](https://img.shields.io/badge/python-v3.9%2B-b0c9ff)
+![python_version](https://img.shields.io/badge/python-3.9-b0c9ff)
 ![dependencies](https://img.shields.io/badge/dependencies-none-e0b0ff)
 
 An application written in Python that enables a fixed setting of subtitle time offsets to a selected **srt**
