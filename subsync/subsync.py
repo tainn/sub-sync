@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-"""A script for setting offsets to subtitle files.
+"""
+A script for setting offsets to subtitle files.
 
 An offset is passed in as a positional argument and is expressed in seconds:
 - negative: hasten (-0.500)
@@ -13,9 +14,11 @@ To specify the exact file, a path keyword argument can be used:
 --path: passes an absolute or relative path to the file.
 
 Upon running, the old subtitle file "foo" will be renamed to "foo-old" and the newly output file
-with the offsets in place will now be named "foo". The old file is not automatically deleted."""
+with the offsets in place will now be named "foo". The old file is not automatically deleted.
+"""
 
 import glob
+import logging
 import os
 import sys
 from argparse import ArgumentParser, Namespace
@@ -23,17 +26,14 @@ from datetime import timedelta as td
 
 
 def main() -> None:
-    """Core delegation of tasks to other functions and their stockpile."""
-
     args: Namespace = parse_args()
     subfile: str = get_file(args)
     change_timelines(args, subfile)
-    print("Complete!")
+
+    logging.info("Complete!")
 
 
 def parse_args() -> Namespace:
-    """Parses positional and optional arguments."""
-
     parser: ArgumentParser = ArgumentParser()
     parser.add_argument("offset", help="amount of seconds to shift (+-0.000)", type=float)
     parser.add_argument("-p", "--path", help="absolute or relative path to the file")
@@ -43,36 +43,28 @@ def parse_args() -> Namespace:
 
 
 def get_file(args: Namespace) -> str:
-    """Fetches the file through a specified method.
-
-    If no method is specified, defaults to the .srt in the current directory.
-    Should multiple .srt files exist in the current directory, --path must be given."""
-
     if args.path:
         return args.path if args.path.endswith(".srt") else f"{args.path}.srt"
 
     srts: set[str] = set(glob.glob("*.srt")) - set(glob.glob("*old-[0-9].srt"))
 
     if len(srts) == 0:
-        sys.exit(
+        logging.error(
             "No .srt file found\n"
             "Position yourself inside a directory with the file or specify it via the --path flag"
         )
+        sys.exit(1)
 
     elif len(srts) != 1:
-        sys.exit(
+        logging.error(
             f"More than 1 .srt file found: {len(srts)}\n" "Consider using the --path flag to specify precisely one"
         )
+        sys.exit(2)
 
     return srts.pop()
 
 
 def change_timelines(args: Namespace, subfile: str) -> None:
-    """Alters the timelines while keeping the original file.
-
-    Fetches the timelines from the original sub file, parses them, renames the old file and
-    drops the new timelines with the offset applied to a new sub file with the old one's name."""
-
     with open(subfile, "r", encoding="ISO-8859-1") as rf:
         original_subfile: str = rf.read()
 
