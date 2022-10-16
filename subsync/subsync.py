@@ -28,15 +28,15 @@ def main() -> None:
     args: Namespace = parse_args()
     subfile: str = get_file(args)
     change_timelines(args, subfile)
-    print('Complete!')
+    print("Complete!")
 
 
 def parse_args() -> Namespace:
     """Parses positional and optional arguments."""
 
     parser: ArgumentParser = ArgumentParser()
-    parser.add_argument('offset', help='amount of seconds to shift (+-0.000)', type=float)
-    parser.add_argument('-p', '--path', help='absolute or relative path to the file')
+    parser.add_argument("offset", help="amount of seconds to shift (+-0.000)", type=float)
+    parser.add_argument("-p", "--path", help="absolute or relative path to the file")
     args: Namespace = parser.parse_args()
 
     return args
@@ -49,20 +49,19 @@ def get_file(args: Namespace) -> str:
     Should multiple .srt files exist in the current directory, --path must be given."""
 
     if args.path:
-        return args.path if args.path.endswith('.srt') else f'{args.path}.srt'
+        return args.path if args.path.endswith(".srt") else f"{args.path}.srt"
 
-    srts: set[str] = set(glob.glob('*.srt')) - set(glob.glob('*old-[0-9].srt'))
+    srts: set[str] = set(glob.glob("*.srt")) - set(glob.glob("*old-[0-9].srt"))
 
     if len(srts) == 0:
         sys.exit(
-            'No .srt file found\n'
-            'Position yourself inside a directory with the file or specify it via the --path flag'
+            "No .srt file found\n"
+            "Position yourself inside a directory with the file or specify it via the --path flag"
         )
 
     elif len(srts) != 1:
         sys.exit(
-            f'More than 1 .srt file found: {len(srts)}\n'
-            'Consider using the --path flag to specify precisely one'
+            f"More than 1 .srt file found: {len(srts)}\n" "Consider using the --path flag to specify precisely one"
         )
 
     return srts.pop()
@@ -74,31 +73,30 @@ def change_timelines(args: Namespace, subfile: str) -> None:
     Fetches the timelines from the original sub file, parses them, renames the old file and
     drops the new timelines with the offset applied to a new sub file with the old one's name."""
 
-    with open(subfile, 'r', encoding='ISO-8859-1') as rf:
+    with open(subfile, "r", encoding="ISO-8859-1") as rf:
         original_subfile: str = rf.read()
 
-    blocks: list[str] = original_subfile.split('\n\n')
+    blocks: list[str] = original_subfile.split("\n\n")
     timelines: list[str] = [line.splitlines()[1] for line in blocks if len(line.splitlines()) >= 3]
 
-    raw_inits_and_ends: list[tuple[str, str]] = [
-        (timeline.split()[0], timeline.split()[2]) for timeline in timelines
-    ]
+    raw_inits_and_ends: list[tuple[str, str]] = [(timeline.split()[0], timeline.split()[2]) for timeline in timelines]
 
     parsed_inits_and_ends: list[tuple[td, td]] = [
         (
             td(
-                hours=float(raw_init.split(':')[0]),
-                minutes=float(raw_init.split(':')[1]),
-                seconds=float(raw_init.split(':')[2].split(',')[0]),
-                milliseconds=float(raw_init.split(':')[2].split(',')[1]),
+                hours=float(raw_init.split(":")[0]),
+                minutes=float(raw_init.split(":")[1]),
+                seconds=float(raw_init.split(":")[2].split(",")[0]),
+                milliseconds=float(raw_init.split(":")[2].split(",")[1]),
             ),
             td(
-                hours=float(raw_end.split(':')[0]),
-                minutes=float(raw_end.split(':')[1]),
-                seconds=float(raw_end.split(':')[2].split(',')[0]),
-                milliseconds=float(raw_end.split(':')[2].split(',')[1]),
-            )
-        ) for raw_init, raw_end in raw_inits_and_ends
+                hours=float(raw_end.split(":")[0]),
+                minutes=float(raw_end.split(":")[1]),
+                seconds=float(raw_end.split(":")[2].split(",")[0]),
+                milliseconds=float(raw_end.split(":")[2].split(",")[1]),
+            ),
+        )
+        for raw_init, raw_end in raw_inits_and_ends
     ]
 
     altered_inits_and_ends: list[tuple[td, td]] = list()
@@ -112,9 +110,10 @@ def change_timelines(args: Namespace, subfile: str) -> None:
 
     formatted_altered_inits_and_ends: list[tuple[str, str]] = [
         (
-            str(init)[:-3].zfill(12).replace('.', ',') if init.microseconds else f'{str(init).zfill(8)},000',
-            str(end)[:-3].zfill(12).replace('.', ',') if end.microseconds else f'{str(end).zfill(8)},000',
-        ) for init, end in altered_inits_and_ends
+            str(init)[:-3].zfill(12).replace(".", ",") if init.microseconds else f"{str(init).zfill(8)},000",
+            str(end)[:-3].zfill(12).replace(".", ",") if end.microseconds else f"{str(end).zfill(8)},000",
+        )
+        for init, end in altered_inits_and_ends
     ]
 
     altered_subfile: str = original_subfile
@@ -122,21 +121,21 @@ def change_timelines(args: Namespace, subfile: str) -> None:
     for (raw_init, raw_end), (altered_init, altered_end) in zip(raw_inits_and_ends, formatted_altered_inits_and_ends):
         altered_subfile: str = altered_subfile.replace(raw_init, altered_init).replace(raw_end, altered_end)
 
-    old_subfile: str = subfile.replace('.srt', '-old-0.srt')
+    old_subfile: str = subfile.replace(".srt", "-old-0.srt")
     increment: int = 1
 
     while True:
         if os.path.isfile(old_subfile):
-            old_subfile: str = old_subfile.replace(f'-old-{increment - 1}.srt', f'-old-{increment}.srt')
+            old_subfile: str = old_subfile.replace(f"-old-{increment - 1}.srt", f"-old-{increment}.srt")
             increment += 1
             continue
 
         os.rename(subfile, old_subfile)
         break
 
-    with open(subfile, 'w', encoding='ISO-8859-1') as wf:
+    with open(subfile, "w", encoding="ISO-8859-1") as wf:
         wf.write(altered_subfile)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
