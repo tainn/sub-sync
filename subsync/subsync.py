@@ -13,8 +13,7 @@ To specify the exact file, a path keyword argument can be used:
 --path: passes an absolute or relative path to the file.
 
 Upon running, the old subtitle file "foo" will be renamed to "foo-old" and the newly output file
-with the offsets in place will now be named "foo". The old file is not automatically deleted.
-"""
+with the offsets in place will now be named "foo". The old file is not automatically deleted."""
 
 import glob
 import os
@@ -33,10 +32,8 @@ def main() -> None:
 
 
 def parse_args() -> Namespace:
-    """Parses positional and optional arguments.
+    """Parses positional and optional arguments."""
 
-    :return: an object holding the parsed args
-    """
     parser: ArgumentParser = ArgumentParser()
     parser.add_argument('offset', help='amount of seconds to shift (+-0.000)', type=float)
     parser.add_argument('-p', '--path', help='absolute or relative path to the file')
@@ -49,11 +46,8 @@ def get_file(args: Namespace) -> str:
     """Fetches the file through a specified method.
 
     If no method is specified, defaults to the .srt in the current directory.
-    Should multiple .srt files exist in the current directory, --path must be given.
+    Should multiple .srt files exist in the current directory, --path must be given."""
 
-    :param args: an object holding the parsed args
-    :return: path to the sub file
-    """
     if args.path:
         return args.path if args.path.endswith('.srt') else f'{args.path}.srt'
 
@@ -78,11 +72,8 @@ def change_timelines(args: Namespace, subfile: str) -> None:
     """Alters the timelines while keeping the original file.
 
     Fetches the timelines from the original sub file, parses them, renames the old file and
-    drops the new timelines with the offset applied to a new sub file with the old one's name.
+    drops the new timelines with the offset applied to a new sub file with the old one's name."""
 
-    :param args: an object holding the parsed args
-    :param subfile: path to the sub file
-    """
     with open(subfile, 'r', encoding='ISO-8859-1') as rf:
         original_subfile: str = rf.read()
 
@@ -99,13 +90,13 @@ def change_timelines(args: Namespace, subfile: str) -> None:
                 hours=float(raw_init.split(':')[0]),
                 minutes=float(raw_init.split(':')[1]),
                 seconds=float(raw_init.split(':')[2].split(',')[0]),
-                milliseconds=float(raw_init.split(':')[2].split(',')[1])
+                milliseconds=float(raw_init.split(':')[2].split(',')[1]),
             ),
             td(
                 hours=float(raw_end.split(':')[0]),
                 minutes=float(raw_end.split(':')[1]),
                 seconds=float(raw_end.split(':')[2].split(',')[0]),
-                milliseconds=float(raw_end.split(':')[2].split(',')[1])
+                milliseconds=float(raw_end.split(':')[2].split(',')[1]),
             )
         ) for raw_init, raw_end in raw_inits_and_ends
     ]
@@ -122,7 +113,7 @@ def change_timelines(args: Namespace, subfile: str) -> None:
     formatted_altered_inits_and_ends: list[tuple[str, str]] = [
         (
             str(init)[:-3].zfill(12).replace('.', ',') if init.microseconds else f'{str(init).zfill(8)},000',
-            str(end)[:-3].zfill(12).replace('.', ',') if end.microseconds else f'{str(end).zfill(8)},000'
+            str(end)[:-3].zfill(12).replace('.', ',') if end.microseconds else f'{str(end).zfill(8)},000',
         ) for init, end in altered_inits_and_ends
     ]
 

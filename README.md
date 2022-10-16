@@ -2,24 +2,24 @@
 
 ![python_version](https://img.shields.io/badge/python-3.9-b0c9ff)
 
-An application written in Python that enables a fixed setting of subtitle time offsets to a selected **srt**
+Enables a fixed setting of subtitle time offsets to a selected **srt**
 file via the CLI by overwriting its time intervals.
 
-It differs from utilizing subtitle shifts inside any media player by permenently applying timeline changes, not just
-during the active session. Sync audio and subtitles once, watch multiple times.
+It differs from utilizing subtitle shifts inside an arbitrary media player by permenently applying timeline changes, not
+just during the active session. Sync audio and subtitles once, watch multiple times.
 
 ## Usage
 
-The script can be executed via the CLI with or without a `-p` or `--path` keyword argument.
+The script can be executed via the CLI with or without a `-p` or `--path` parameter.
 
 If omitting the use, the code will look for a **srt** file in the current working directory and exit if none or more
-than one match is found. An exception to this case are **srt** files that abide by a regex match: `*old-[0-9].srt`. This
-is done in order to allow rapid readjustments when attempting to set an audio-subtitle sync via trial and
+than one match is found. An exception to this case are **srt** files that abide by a match: `*old-[0-n].srt`. This is
+done in order to allow rapid readjustments when attempting to set an audio-subtitle sync via trial and
 error—see [output](#output).
 
 Help can be output through the use of the `-h` or `--help` option:
 
-```
+```commandline
 [user@host ~]$ subsync.py -h
 usage: subsync.py [-h] [-p PATH] offset
 
