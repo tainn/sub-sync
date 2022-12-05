@@ -10,13 +10,12 @@ multiple times.
 
 ## Usage
 
-A negative offset value ***hastens***, while a positive offset value ***delays*** the subtitles. The script can be
-executed via the CLI with or without a `-p` or `--path` parameter.
+A negative offset value ***hastens***, while a positive offset value ***delays*** the subtitles.
 
-If omitting the use, the code will look for a `srt` file in the current working directory and exit if none or more
-than one match is found. An exception to this case are `srt` files that abide by a glob match: `*old-[0-9].srt`. This
-is done in order to allow rapid readjustments when attempting to set an audio-subtitle sync via trial and
-error—see [output](#output).
+The script can be executed via the CLI with or without a `-p` or `--path` parameter. If omitting the use, the code will
+look for a `srt` file in the current working directory and exit if none or more than one match is found. An exception to
+this case are `srt` files that abide by a glob match: `*old-[0-9].srt`. This is done in order to allow rapid
+readjustments when attempting to set an audio-subtitle sync via trial and error—see [output](#output).
 
 Help can be output through the use of the `-h` or `--help` option:
 
