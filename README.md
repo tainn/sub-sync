@@ -1,6 +1,6 @@
 # sub-sync
 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Code style: black](https://img.shields.io/badge/style-black-000000.svg)](https://github.com/psf/black)
 
 Enables a fixed setting of subtitle time offsets to a selected `srt` file via the CLI by overwriting its time intervals.
 
