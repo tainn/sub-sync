@@ -2,11 +2,11 @@
 
 [![Code style: black](https://img.shields.io/badge/style-black-000000.svg)](https://github.com/psf/black)
 
-Enables a fixed setting of subtitle time offsets to a selected `srt` file via the CLI by overwriting its time intervals.
+Enables a fixed setting of subtitle time offsets to a selected [subrip](https://en.wikipedia.org/wiki/SubRip) (`srt`)
+file via the CLI by overwriting its time intervals.
 
 It differs from utilizing subtitle shifts inside an arbitrary media player, due to permenently applying timeline
-changes, not just during an active session. In other words, sync audio and subtitle tracks once, use them appropriately
-multiple times.
+changes, not just during an active session — sync audio and subtitle tracks once, use them multiple times.
 
 ## Usage
 
@@ -14,14 +14,18 @@ A negative offset value ***hastens***, while a positive offset value ***delays**
 
 The script can be executed via the CLI with or without a `-p` or `--path` parameter. If omitting the use, the code will
 look for a `srt` file in the current working directory and exit if none or more than one match is found. An exception to
-this case are `srt` files that abide by a glob match: `*old-[0-9].srt`. This is done in order to allow rapid
-readjustments when attempting to set an audio-subtitle sync via trial and error—see [output](#output).
+this case are `srt` files that abide by a glob match: `*old-[0-9][0-9].srt`. This is done in order to allow rapid
+readjustments (up to 100 times) when attempting to set an audio-subtitle sync via trial and error —
+see [output](#output).
 
-Help can be output through the use of the `-h` or `--help` option:
+### Path
 
-```commandline
-$ subsync.py --help
-usage: subsync.py [-h] [-p PATH] offset
+For ease of use, the script can be put anywhere in your `PATH` and renamed to whatever doesn't conflict with the global
+namespace. For example, omitting the `.py` extension and running it with the `-h` option to output help:
+
+```console
+foo@bar:~$ subsync -h
+usage: subsync [-h] [-p PATH] offset
 
 positional arguments:
   offset                amount of seconds to shift (+-0.000)
@@ -35,16 +39,11 @@ options:
 
 The output is a new `srt` file with newly set timelines, with the old file being kept and renamed
 to `-old-{increment}.srt`, where `{increment}` is a serial increment of old `srt` files in the same directory, starting
-with 0.
+with 00 and ending with 99, allowing for up to 100 buffered old files.
 
 ## Bad forms
 
-`srt` files usually follow the ordered principle of:
-
-1. enumeration
-2. time interval
-3. sub content
-
+The subrip (`srt`) files usually follow their file [format](https://en.wikipedia.org/wiki/SubRip#SubRip_file_format).
 This code assumes that to be the form of the passed file and may error out if the form is different. Even though it
 rarely happens, the culprit for such mismatches is usually a type of bad-form advertising of a subtitle group at the top
 of the file. Either manually delete that segment or change it to fit the format.

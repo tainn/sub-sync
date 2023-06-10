@@ -4,47 +4,67 @@ import glob
 import os
 import sys
 from argparse import ArgumentParser, Namespace
+from dataclasses import dataclass
 from datetime import timedelta as td
 
 
+@dataclass
+class BaseStruct:
+    args: Namespace = None
+    srt_path: str = None
+    alt_srt: str = None
+
+
 def main() -> None:
-    args: Namespace = parse_args()
-    subsfile: str = get_file(args)
-    change_timelines(args, subsfile)
+    struct = BaseStruct()
+
+    parse_args(struct)
+    get_srt(struct)
+    change_timelines(struct)
+    create_alt_srt(struct)
 
 
-def parse_args() -> Namespace:
-    parser: ArgumentParser = ArgumentParser()
-    parser.add_argument("offset", help="amount of seconds to shift (+-0.000)", type=float)
-    parser.add_argument("-p", "--path", help="absolute or relative path to the file")
-    return parser.parse_args()
+def parse_args(struct: BaseStruct) -> None:
+    parser = ArgumentParser()
+    parser.add_argument(
+        "offset",
+        help="amount of seconds to shift (+-0.000)",
+        type=float,
+    )
+    parser.add_argument(
+        "-p",
+        "--path",
+        help="absolute or relative path to the file",
+    )
+    struct.args = parser.parse_args()
 
 
-def get_file(args: Namespace) -> str:
-    if args.path:
-        return args.path if args.path.endswith(".srt") else f"{args.path}.srt"
+def get_srt(struct: BaseStruct) -> None:
+    if struct.args.path:
+        struct.srt_path = struct.args.path if struct.args.path.endswith(".srt") else f"{struct.args.path}.srt"
+        return
 
-    srts: set[str] = set(glob.glob("*.srt")) - set(glob.glob("*old-[0-9].srt"))
+    srts: set[str] = set(glob.glob("*.srt")) - set(glob.glob("*old-[0-9][0-9].srt"))
 
-    if len(srts) == 0:
-        print("No .srt file found", file=sys.stderr)
-        sys.exit(1)
+    match len(srts):
+        case 0:
+            sys.exit("No srt file found")
+        case 1:
+            pass
+        case _:
+            sys.exit(f"More than 1 srt file found: {len(srts)} {tuple(srts)}")
 
-    elif len(srts) > 1:
-        print(f"More than 1 .srt file found: {len(srts)}", file=sys.stderr)
-        sys.exit(2)
-
-    return srts.pop()
+    struct.srt_path = srts.pop()
 
 
-def change_timelines(args: Namespace, subsfile: str) -> None:
-    with open(subsfile, "r", encoding="ISO-8859-1") as rf:
-        original_subsfile: str = rf.read().strip()
+def change_timelines(struct: BaseStruct) -> None:
+    with open(struct.srt_path, "r", encoding="ISO-8859-1") as rf:
+        origin_srt: str = rf.read().strip()
 
-    blocks: list[str] = original_subsfile.split("\n\n")
+    blocks: list[str] = origin_srt.split("\n\n")
     timelines: list[str] = [line.splitlines()[1] for line in blocks if len(line.splitlines()) >= 3]
 
-    raw_inits_and_ends: list[tuple[str, str]] = [
+    raw_times: list[tuple[str, str]] = [
         (
             timeline.split()[0],
             timeline.split()[2],
@@ -52,60 +72,65 @@ def change_timelines(args: Namespace, subsfile: str) -> None:
         for timeline in timelines
     ]
 
-    parsed_inits_and_ends: list[tuple[td, td]] = [
+    parsed_times: list[tuple[td, td]] = [
         (
             td(
-                hours=float(raw_init.split(":")[0]),
-                minutes=float(raw_init.split(":")[1]),
-                seconds=float(raw_init.split(":")[2].split(",")[0]),
-                milliseconds=float(raw_init.split(":")[2].split(",")[1]),
+                hours=float(init.split(":")[0]),
+                minutes=float(init.split(":")[1]),
+                seconds=float(init.split(":")[2].split(",")[0]),
+                milliseconds=float(init.split(":")[2].split(",")[1]),
             ),
             td(
-                hours=float(raw_end.split(":")[0]),
-                minutes=float(raw_end.split(":")[1]),
-                seconds=float(raw_end.split(":")[2].split(",")[0]),
-                milliseconds=float(raw_end.split(":")[2].split(",")[1]),
+                hours=float(end.split(":")[0]),
+                minutes=float(end.split(":")[1]),
+                seconds=float(end.split(":")[2].split(",")[0]),
+                milliseconds=float(end.split(":")[2].split(",")[1]),
             ),
         )
-        for raw_init, raw_end in raw_inits_and_ends
+        for init, end in raw_times
     ]
 
-    altered_inits_and_ends: list[tuple[td, td]] = list()
-    offset: td = td(seconds=args.offset)
+    alt_times: list[tuple[td, td]] = list()
+    offset: td = td(seconds=struct.args.offset)
 
-    for init, end in parsed_inits_and_ends:
+    for init, end in parsed_times:
         if (init + offset).total_seconds() < 0:
             continue
 
-        altered_inits_and_ends.append((init + offset, end + offset))
+        alt_times.append((init + offset, end + offset))
 
-    formatted_altered_inits_and_ends: list[tuple[str, str]] = [
+    formatted_alt_times: list[tuple[str, str]] = [
         (
             str(init)[:-3].zfill(12).replace(".", ",") if init.microseconds else f"{str(init).zfill(8)},000",
             str(end)[:-3].zfill(12).replace(".", ",") if end.microseconds else f"{str(end).zfill(8)},000",
         )
-        for init, end in altered_inits_and_ends
+        for init, end in alt_times
     ]
 
-    altered_subsfile: str = original_subsfile
+    struct.alt_srt = origin_srt
 
-    for (raw_init, raw_end), (altered_init, altered_end) in zip(raw_inits_and_ends, formatted_altered_inits_and_ends):
-        altered_subsfile: str = altered_subsfile.replace(raw_init, altered_init).replace(raw_end, altered_end)
+    for (init, end), (alt_init, alt_end) in zip(raw_times, formatted_alt_times):
+        struct.alt_srt = struct.alt_srt.replace(init, alt_init).replace(end, alt_end)
 
-    old_subsfile: str = subsfile.replace(".srt", "-old-0.srt")
+
+def create_alt_srt(struct: BaseStruct) -> None:
+    origin_srt_path: str = struct.srt_path.replace(".srt", "-old-00.srt")
     increment: int = 1
 
     while True:
-        if os.path.isfile(old_subsfile):
-            old_subsfile: str = old_subsfile.replace(f"-old-{increment - 1}.srt", f"-old-{increment}.srt")
+        if os.path.isfile(origin_srt_path):
+            origin_srt_path: str = origin_srt_path.replace(
+                f"-old-{str(increment - 1).zfill(2)}.srt",
+                f"-old-{str(increment).zfill(2)}.srt",
+            )
             increment += 1
             continue
 
-        os.rename(subsfile, old_subsfile)
+        os.rename(struct.srt_path, origin_srt_path)
         break
 
-    with open(subsfile, "w", encoding="ISO-8859-1") as wf:
-        wf.write(altered_subsfile)
+    with open(struct.srt_path, "w", encoding="ISO-8859-1") as wf:
+        wf.write(struct.alt_srt)
 
 
 if __name__ == "__main__":
