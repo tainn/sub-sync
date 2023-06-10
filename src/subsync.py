@@ -10,9 +10,9 @@ from datetime import timedelta as td
 
 @dataclass
 class BaseStruct:
-    args: Namespace = None
-    srt_path: str = None
-    alt_srt: str = None
+    args: Namespace | None = None
+    srt_path: str | None = None
+    alt_srt: str | None = None
 
 
 def main() -> None:
@@ -40,6 +40,8 @@ def parse_args(struct: BaseStruct) -> None:
 
 
 def get_srt(struct: BaseStruct) -> None:
+    assert struct.args is not None
+
     if struct.args.path:
         struct.srt_path = struct.args.path if struct.args.path.endswith(".srt") else f"{struct.args.path}.srt"
         return
@@ -58,6 +60,9 @@ def get_srt(struct: BaseStruct) -> None:
 
 
 def change_timelines(struct: BaseStruct) -> None:
+    assert struct.args is not None
+    assert struct.srt_path is not None
+
     with open(struct.srt_path, "r", encoding="ISO-8859-1") as rf:
         origin_srt: str = rf.read().strip()
 
@@ -75,58 +80,58 @@ def change_timelines(struct: BaseStruct) -> None:
     parsed_times: list[tuple[td, td]] = [
         (
             td(
-                hours=float(init.split(":")[0]),
-                minutes=float(init.split(":")[1]),
-                seconds=float(init.split(":")[2].split(",")[0]),
-                milliseconds=float(init.split(":")[2].split(",")[1]),
+                hours=float(r_init.split(":")[0]),
+                minutes=float(r_init.split(":")[1]),
+                seconds=float(r_init.split(":")[2].split(",")[0]),
+                milliseconds=float(r_init.split(":")[2].split(",")[1]),
             ),
             td(
-                hours=float(end.split(":")[0]),
-                minutes=float(end.split(":")[1]),
-                seconds=float(end.split(":")[2].split(",")[0]),
-                milliseconds=float(end.split(":")[2].split(",")[1]),
+                hours=float(r_end.split(":")[0]),
+                minutes=float(r_end.split(":")[1]),
+                seconds=float(r_end.split(":")[2].split(",")[0]),
+                milliseconds=float(r_end.split(":")[2].split(",")[1]),
             ),
         )
-        for init, end in raw_times
+        for r_init, r_end in raw_times
     ]
 
     alt_times: list[tuple[td, td]] = list()
     offset: td = td(seconds=struct.args.offset)
 
-    for init, end in parsed_times:
-        if (init + offset).total_seconds() < 0:
+    for p_init, p_end in parsed_times:
+        if (p_init + offset).total_seconds() < 0:
             continue
 
-        alt_times.append((init + offset, end + offset))
+        alt_times.append((p_init + offset, p_end + offset))
 
     formatted_alt_times: list[tuple[str, str]] = [
         (
-            str(init)[:-3].zfill(12).replace(".", ",") if init.microseconds else f"{str(init).zfill(8)},000",
-            str(end)[:-3].zfill(12).replace(".", ",") if end.microseconds else f"{str(end).zfill(8)},000",
+            str(a_init)[:-3].zfill(12).replace(".", ",") if a_init.microseconds else f"{str(a_init).zfill(8)},000",
+            str(a_end)[:-3].zfill(12).replace(".", ",") if a_end.microseconds else f"{str(a_end).zfill(8)},000",
         )
-        for init, end in alt_times
+        for a_init, a_end in alt_times
     ]
 
     struct.alt_srt = origin_srt
 
-    for (init, end), (alt_init, alt_end) in zip(raw_times, formatted_alt_times):
-        struct.alt_srt = struct.alt_srt.replace(init, alt_init).replace(end, alt_end)
+    for (r_init, r_end), (fa_init, fa_end) in zip(raw_times, formatted_alt_times):
+        struct.alt_srt = struct.alt_srt.replace(r_init, fa_init).replace(r_end, fa_end)
 
 
 def create_alt_srt(struct: BaseStruct) -> None:
-    origin_srt_path: str = struct.srt_path.replace(".srt", "-old-00.srt")
-    increment: int = 1
+    assert struct.srt_path is not None
+    assert struct.alt_srt is not None
+
+    increment: int = 0
 
     while True:
-        if os.path.isfile(origin_srt_path):
-            origin_srt_path: str = origin_srt_path.replace(
-                f"-old-{str(increment - 1).zfill(2)}.srt",
-                f"-old-{str(increment).zfill(2)}.srt",
-            )
+        old_path: str = struct.srt_path.replace(".srt", f"-old-{str(increment).zfill(2)}.srt")
+
+        if os.path.isfile(old_path):
             increment += 1
             continue
 
-        os.rename(struct.srt_path, origin_srt_path)
+        os.rename(struct.srt_path, old_path)
         break
 
     with open(struct.srt_path, "w", encoding="ISO-8859-1") as wf:

@@ -1,2 +1,6 @@
+# Generic
 .idea
+.mypy_cache
+
+# Project
 *.srt

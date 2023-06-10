@@ -1,6 +1,8 @@
 # sub-sync
 
 [![Code style: black](https://img.shields.io/badge/style-black-000000.svg)](https://github.com/psf/black)
+[![Type check: mypy](https://img.shields.io/badge/type-mypy-efecbc.svg)](https://github.com/python/mypy)
+[![Imports sort: isort](https://img.shields.io/badge/import-isort-e88134.svg)](https://github.com/pycqa/isort)
 
 Enables a fixed setting of subtitle time offsets to a selected [subrip](https://en.wikipedia.org/wiki/SubRip) (`srt`)
 file via the CLI by overwriting its time intervals.
@@ -38,8 +40,8 @@ options:
 ## Output
 
 The output is a new `srt` file with newly set timelines, with the old file being kept and renamed
-to `-old-{increment}.srt`, where `{increment}` is a serial increment of old `srt` files in the same directory, starting
-with 00 and ending with 99, allowing for up to 100 buffered old files.
+to `-old-{incr}.srt`, where `{incr}` is a serial increment of old `srt` files in the same directory, starting
+with 00 and ending with 99, allowing for up to 100 buffered files.
 
 ## Bad forms
 
