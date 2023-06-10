@@ -12,7 +12,7 @@ changes, not just during an active session — sync audio and subtitle tracks on
 
 ## Usage
 
-A negative offset value ***hastens***, while a positive offset value ***delays*** the subtitles.
+A negative offset value **hastens**, while a positive offset value **delays** the subtitles.
 
 The script can be executed via the CLI with or without a `-p` or `--path` parameter. If omitting the use, the code will
 look for a `srt` file in the current working directory and exit if none or more than one match is found. An exception to
