@@ -1,8 +1,9 @@
 [tool.black]
 line-length = 120
 
+[tool.ruff]
+line-length = 120
+src = ["src"]
+
 [tool.mypy]
 strict = true
-
-[tool.isort]
-profile = "black"
