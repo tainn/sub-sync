@@ -1,8 +1,8 @@
 # sub-sync
 
-[![black](https://img.shields.io/badge/style-black-bbbbbb.svg)](https://github.com/psf/black)
-[![ruff](https://img.shields.io/badge/lint-ruff-bbbbbb.svg)](https://github.com/astral-sh/ruff)
-[![mypy](https://img.shields.io/badge/type-mypy-bbbbbb.svg)](https://github.com/python/mypy)
+[![black](https://img.shields.io/badge/style-black-a16668.svg)](https://github.com/psf/black)
+[![ruff](https://img.shields.io/badge/lint-ruff-a16668.svg)](https://github.com/astral-sh/ruff)
+[![mypy](https://img.shields.io/badge/type-mypy-a16668.svg)](https://github.com/python/mypy)
 
 Enables a fixed setting of subtitle time offsets to a selected [subrip](https://en.wikipedia.org/wiki/SubRip) (`srt`)
 file via the CLI by overwriting its time intervals.
