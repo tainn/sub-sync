@@ -10,7 +10,7 @@ file via the CLI by overwriting its time intervals.
 It differs from utilizing subtitle shifts inside an arbitrary media player, due to permenently applying timeline
 changes, not just during an active session — sync audio and subtitle tracks once, use them multiple times.
 
-### Usage
+## Usage
 
 A negative offset value **hastens**, while a positive offset value **delays** the subtitles.
 
@@ -20,7 +20,7 @@ this case are `srt` files that abide by a glob match: `*old-[0-9][0-9].srt`. Thi
 readjustments (up to 100 times) when attempting to set an audio-subtitle sync via trial and error —
 see [output](#output).
 
-#### Path
+### Path
 
 For ease of use, the script can be put anywhere in your `PATH` and renamed to whatever doesn't conflict with the global
 namespace. For example, omitting the `.py` extension and running it with the `-h` option to output help:
@@ -37,13 +37,13 @@ options:
   -p PATH, --path PATH  absolute or relative path to the file
 ```
 
-### Output
+## Output
 
 The output is a new `srt` file with newly set timelines, with the old file being kept and renamed
 to `-old-{incr}.srt`, where `{incr}` is a serial increment of old `srt` files in the same directory, starting
 with 00 and ending with 99, allowing for up to 100 buffered files.
 
-### Bad forms
+## Bad forms
 
 The subrip (`srt`) files usually follow their file [format](https://en.wikipedia.org/wiki/SubRip#SubRip_file_format).
 This code assumes that to be the form of the passed file and may error out if the form is different. Even though it
