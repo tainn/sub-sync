@@ -5,14 +5,14 @@ import os
 import sys
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
-from datetime import timedelta as td
+from datetime import timedelta
 
 
 @dataclass
 class BaseStruct:
     args: Namespace | None = None
-    srt_path: str | None = None
-    alt_srt: str | None = None
+    srt_path: str = ""
+    alt_srt: str = ""
 
 
 def main() -> None:
@@ -61,7 +61,6 @@ def get_srt(struct: BaseStruct) -> None:
 
 def change_timelines(struct: BaseStruct) -> None:
     assert struct.args is not None
-    assert struct.srt_path is not None
 
     with open(struct.srt_path, "r", encoding="ISO-8859-1") as rf:
         origin_srt: str = rf.read().strip()
@@ -77,26 +76,16 @@ def change_timelines(struct: BaseStruct) -> None:
         for timeline in timelines
     ]
 
-    parsed_times: list[tuple[td, td]] = [
+    parsed_times: list[tuple[timedelta, timedelta]] = [
         (
-            td(
-                hours=float(r_init.split(":")[0]),
-                minutes=float(r_init.split(":")[1]),
-                seconds=float(r_init.split(":")[2].split(",")[0]),
-                milliseconds=float(r_init.split(":")[2].split(",")[1]),
-            ),
-            td(
-                hours=float(r_end.split(":")[0]),
-                minutes=float(r_end.split(":")[1]),
-                seconds=float(r_end.split(":")[2].split(",")[0]),
-                milliseconds=float(r_end.split(":")[2].split(",")[1]),
-            ),
+            parse_times(r_init),
+            parse_times(r_end),
         )
         for r_init, r_end in raw_times
     ]
 
-    alt_times: list[tuple[td, td]] = list()
-    offset: td = td(seconds=struct.args.offset)
+    alt_times: list[tuple[timedelta, timedelta]] = list()
+    offset: timedelta = timedelta(seconds=struct.args.offset)
 
     for p_init, p_end in parsed_times:
         if (p_init + offset).total_seconds() < 0:
@@ -118,10 +107,16 @@ def change_timelines(struct: BaseStruct) -> None:
         struct.alt_srt = struct.alt_srt.replace(r_init, fa_init).replace(r_end, fa_end)
 
 
-def create_alt_srt(struct: BaseStruct) -> None:
-    assert struct.srt_path is not None
-    assert struct.alt_srt is not None
+def parse_times(raw: str) -> timedelta:
+    return timedelta(
+        hours=float(raw.split(":")[0]),
+        minutes=float(raw.split(":")[1]),
+        seconds=float(raw.split(":")[2].split(",")[0]),
+        milliseconds=float(raw.split(":")[2].split(",")[1]),
+    )
 
+
+def create_alt_srt(struct: BaseStruct) -> None:
     increment: int = 0
 
     while True:
