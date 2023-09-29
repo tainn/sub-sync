@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sub-sync"
-version = "v1.0"
+version = "v1.1"
 description = "Setting of subrip time offsets via the CLI"
 readme = "README.md"
 authors = [{ name = "tainn" }]
