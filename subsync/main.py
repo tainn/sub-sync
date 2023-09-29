@@ -23,6 +23,8 @@ def main() -> None:
     change_timelines(struct)
     create_alt_srt(struct)
 
+    print("Complete!")
+
 
 def parse_args(struct: BaseStruct) -> None:
     parser = ArgumentParser()
@@ -135,4 +137,3 @@ def create_alt_srt(struct: BaseStruct) -> None:
 
 if __name__ == "__main__":
     main()
-    print("Complete!")

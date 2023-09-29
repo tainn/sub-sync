@@ -10,6 +10,14 @@ file via the CLI by overwriting its time intervals.
 It differs from utilizing subtitle shifts inside an arbitrary media player, due to permenently applying timeline
 changes, not just during an active session — sync audio and subtitle tracks once, use them multiple times.
 
+## Install
+
+Fetch the latest version:
+
+```console
+python3 -m pip install git+https://github.com/tainn/sub-sync.git@v1.0
+```
+
 ## Usage
 
 A negative offset value **hastens**, while a positive offset value **delays** the subtitles.
@@ -20,13 +28,8 @@ this case are `srt` files that abide by a glob match: `*old-[0-9][0-9].srt`. Thi
 readjustments (up to 100 times) when attempting to set an audio-subtitle sync via trial and error —
 see [output](#output).
 
-### Path
-
-For ease of use, the script can be put anywhere in your `PATH` and renamed to whatever doesn't conflict with the global
-namespace. For example, omitting the `.py` extension and running it with the `-h` option to output help:
-
 ```console
-foo@bar:~$ subsync -h
+foo@bar:~$ subsync --help
 usage: subsync [-h] [-p PATH] offset
 
 positional arguments:

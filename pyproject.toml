@@ -1,3 +1,26 @@
+[build-system]
+requires = ["setuptools>=68.1.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sub-sync"
+version = "v1.0"
+description = "Setting of subrip time offsets via the CLI"
+readme = "README.md"
+authors = [{ name = "tainn" }]
+keywords = ["sub", "sync", "offset"]
+dependencies = []
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+dev = ["black", "ruff", "mypy"]
+
+[project.urls]
+Homepage = "https://github.com/tainn/sub-sync"
+
+[project.scripts]
+subsync = "subsync:main"
+
 [tool.black]
 line-length = 120
 
@@ -11,7 +34,8 @@ known-first-party = ["src"]
 
 [tool.mypy]
 strict = true
+exclude = ["build"]
 
 [[tool.mypy.overrides]]
-module = []
+module = ["setuptools"]
 ignore_missing_imports = true
