@@ -29,7 +29,7 @@ readjustments (up to 100 times) when attempting to set an audio-subtitle sync vi
 see [output](#output).
 
 ```console
-foo@bar:~$ subsync --help
+$ subsync --help
 usage: subsync [-h] [-p PATH] offset
 
 positional arguments:
