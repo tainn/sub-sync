@@ -15,7 +15,7 @@ changes, not just during an active session — sync audio and subtitle tracks on
 Fetch the latest version:
 
 ```console
-python3 -m pip install git+https://github.com/tainn/sub-sync.git@v1.1
+python3 -m pip install git+https://github.com/tainn/sub-sync.git@0.1.2
 ```
 
 ## Usage
