@@ -25,14 +25,14 @@ subsync = "subsync:main"
 fix = true
 indent-width = 4
 line-length = 120
-src = ["src"]
+src = ["subsync"]
 select = [
     "I001",
     "F401"
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["src"]
+known-first-party = ["subsync"]
 
 [tool.ruff.format]
 indent-style = "space"
