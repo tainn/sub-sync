@@ -1,8 +1,10 @@
+# dev
 .idea
-
+venv
 .ruff_cache
 .mypy_cache
 build
 *.egg-info
 
+# content
 *.srt

@@ -1,16 +1,12 @@
 [build-system]
-requires = ["setuptools>=68.1.0", "wheel"]
+requires = ["setuptools>=69.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "sub-sync"
 version = "0.1.2"
-description = "Setting of subrip time offsets"
-readme = "README.md"
-authors = [{ name = "tainn" }]
-keywords = ["cli", "subtitles"]
+readme = "readme.md"
 dependencies = []
-requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = ["ruff", "mypy"]
@@ -26,6 +22,8 @@ fix = true
 indent-width = 4
 line-length = 120
 src = ["subsync"]
+
+[tool.ruff.lint]
 select = [
     "I001",
     "F401"
@@ -42,7 +40,11 @@ skip-magic-trailing-comma = false
 
 [tool.mypy]
 strict = true
-exclude = ["build"]
+disable_error_code = [
+    "no-any-return",
+    "func-returns-value"
+]
+exclude = ["venv", "build"]
 
 [[tool.mypy.overrides]]
 module = ["setuptools"]
